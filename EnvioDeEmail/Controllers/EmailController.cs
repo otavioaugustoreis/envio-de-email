@@ -8,7 +8,7 @@ namespace EnvioDeEmail.Controllers
     [Route("[controller]")]
     public class EmailController : ControllerBase
     {
-        private IFluentEmail _fluentEmail;
+        private readonly IFluentEmail _fluentEmail;
 
         public EmailController(IFluentEmail fluentEmail)
         {
@@ -19,9 +19,10 @@ namespace EnvioDeEmail.Controllers
         public async Task<ActionResult> EnviarEmail([FromBody] string destinatario)
         {
 
-            var enviar = await _fluentEmail.To(destinatario)
+            var enviar = await _fluentEmail.To(destinatario.Trim().ToLower())
                                .Body("The body")
                                .SendAsync();
+
             if (!enviar.Successful)
             {
                 return BadRequest($"Ocorreu um problema ao enviar e-mail para : {destinatario}");

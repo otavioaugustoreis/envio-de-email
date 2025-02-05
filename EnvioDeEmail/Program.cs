@@ -1,12 +1,21 @@
+using System.Net.Mail;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+var smtpSection = builder.Configuration.GetSection("SmtpSettings");
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddFluentEmail("oaugusto265@gmail.com");
+builder.Services.AddFluentEmail(smtpSection["Username"])
+    .AddSmtpSender(() => new SmtpClient(smtpSection["Host"])
+    {
+        Port = int.Parse(smtpSection["Port"]),
+        Credentials = new System.Net.NetworkCredential(smtpSection["Username"], smtpSection["Password"]),
+        EnableSsl = bool.Parse(smtpSection["EnableSSL"])
+    });
 
 var app = builder.Build();
 
